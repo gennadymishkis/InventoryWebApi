@@ -13,8 +13,7 @@ namespace InventoryWebApi.Controllers
     public class InventoryItemController : ApiController
     {
         static readonly IInventoryItemRepository repository = new InventoryItemRepository();
-
-        List<InventoryItem> items = new List<InventoryItem>();
+        readonly List<InventoryItem> items = new List<InventoryItem>();
 
         public InventoryItemController() { }
 
@@ -29,43 +28,55 @@ namespace InventoryWebApi.Controllers
             return repository.GetAll();
         }
 
+        public InventoryItem GetItem(int id)
+        {
+            InventoryItem item = repository.Get(id);
+            if (item == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return item;
+        }
+
+        #region " Used by unit tests and application asyn calls "
         //public async Task<IEnumerable<InventoryItem>> GetAllItemsAsync()
         //{
         //    return await Task.FromResult(GetAllItems());
         //}
 
-        public IHttpActionResult GetItem(int id)
-        {
-            InventoryItem item = repository.GetAll().FirstOrDefault((p) => p.Id == id);
-            if (item == null)
-            {
-                return NotFound();
-            }
-            return Ok(item);
+        //public IHttpActionResult GetItem_UnitTest(int id)
+        //{
+        //    InventoryItem item = repository.GetAll().FirstOrDefault((p) => p.Id == id);
+        //    if (item == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(item);
 
-        }
-        public IHttpActionResult GetItemByName(string name)
-        {
-            InventoryItem item = repository.GetAll().FirstOrDefault((p) => p.Name == name);
-            if (item == null)
-            {
-                return NotFound();
-            }
-            return Ok(item);
-        }
+        //}
+
+        //public IHttpActionResult GetItemByName(string name)
+        //{
+        //    InventoryItem item = repository.GetAll().FirstOrDefault((p) => p.Name == name);
+        //    if (item == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(item);
+        //}
 
         //public async Task<IHttpActionResult> GetItemAsync(int id)
         //{
         //    return await Task.FromResult(GetItem(id));
         //}
 
+        #endregion
+
         public IEnumerable<InventoryItem> GetItemsByName(string name)
         {
             return repository.GetAll().Where(
                 p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase));
         }
-
-        
 
         public HttpResponseMessage PostItem(InventoryItem item)
         {

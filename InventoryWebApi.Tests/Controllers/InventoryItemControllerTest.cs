@@ -40,11 +40,11 @@ namespace InventoryWebApi.Tests.Controllers
         public void GetItem_ShouldReturnCorrectItem()
         {
             var testItems = GetTestItems();
-            var controller = new InventoryItemController(testItems);
+            var controller = new InventoryItemController(GetTestItems());
 
-            var result = controller.GetItem(3) as OkNegotiatedContentResult<InventoryItem>;
+            var result = controller.GetItem(id: 3);
             Assert.IsNotNull(result);
-            Assert.AreEqual(testItems[3].Name, result.Content.Name);
+            Assert.AreEqual(testItems[3].Name, result.Name);
         }
 
         //[TestMethod]
@@ -63,7 +63,7 @@ namespace InventoryWebApi.Tests.Controllers
         {
             var controller = new InventoryItemController(GetTestItems());
 
-            var result = controller.GetItem(999);
+            var result = controller.GetItem(id: 999);
             Assert.IsInstanceOfType(result, typeof(NotFoundResult));
         }
 
