@@ -1,0 +1,122 @@
+﻿
+@*<div style="margin-top:50px">
+        <h1>All Inventory</h1>
+    </div>*@
+
+@*<ul id="items"></ul>
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            $.getJSON('http://localhost:62718/api/InventoryItem', function (itemsJsonPayload) {
+                $(itemsJsonPayload).each(function (i, item) {
+                    $('#items').append('<li>' + item.Name + ' - ' + item.Description + ' - $' + item.Price + '</li>');
+                });
+            });
+        });
+    </script>
+}*@
+<div style="margin-top:50px">
+    <h1>All Inventory</h1>
+    <ul id="items" />
+</div>
+<div>
+    <h2>Search by ID</h2>
+    <input type="text" id="itemId" size="50" />
+    <input type="button" value="Search" onclick="find();" />
+    @*<p id="item" />*@
+    <h2>Shopping Basket</h2>
+    <div id="result"></div>
+    <div id="totalPrice1" hidden></div>
+    <div id="totalPrice2" hidden></div>
+</div>
+<ul class="cart" id="cart_id"></ul>
+<form>
+    <br>Total Price:
+    <input type="text" name="totalPrice3" id="totalPrice3" value="$ 0" disabled>
+</form>
+
+
+<script>
+    var uri = 'http://localhost:62718/api/InventoryItem';
+
+    $(document).ready(function () {
+      // Send an AJAX request
+      $.getJSON(uri)
+          .done(function (data) {
+            // On success, 'data' contains a list of products.
+            $.each(data, function (key, item) {
+              // Add a list item for the product.
+              $('<li>', { text: formatItem(item) }).appendTo($('#items'));
+            });
+          });
+    });
+
+
+    function formatItem(item) {
+        return 'ID:' + item.Id + '.' + item.Name + '(' + item.Description + ') : $' + item.Price; 
+    }
+
+    function find() {
+      var total = 0
+      var id = $('#itemId').val();
+      $.getJSON(uri + '/' + id)
+          .done(function (data) {
+              //$('#item').text(formatItem(data));
+              var theDiv = document.getElementById("result");
+              theDiv.innerHTML += '<br/>' + formatItem(data);
+
+              var totalArray = data.Price + ',';
+             
+              addTotal(totalArray)
+
+               var theDiv1 = document.getElementById("totalPrice1");
+               var theDiv2 = document.getElementById("totalPrice2");
+
+              var str = theDiv1.textContent;
+              str = str.slice(0, -1);
+              theDiv2.innerHTML = str;
+
+              var val = theDiv2.innerHTML;
+              var temp = val.split(",");
+              var total = 0;
+              var v;
+              for (var i = 0; i < temp.length; i++) {
+                  v = parseFloat(temp[i]);
+                  if (!isNaN(v)) total += v;
+              }
+              document.getElementById("totalPrice3").value = "$" + total;
+
+          })
+          .fail(function (jqXHR, textStatus, err) {
+            $('#item').text('Error: ' + err);
+          });
+    }
+
+    function addTotal(total) {
+        var theDiv = document.getElementById("totalPrice1");
+        var content = document.createTextNode(total);
+        theDiv.appendChild(content);
+    }
+
+    function sumArray(array) {
+        for (
+          var
+            index = 0,              // The iterator
+            length = array.length,  // Cache the array length
+            sum = 0;                // The total amount
+            index < length;         // The "for"-loop condition
+            sum += array[index++]   // Add number on each iteration
+        );
+        return sum;
+    }
+
+</script>
+
+
+
+
+
+
+
+
+
